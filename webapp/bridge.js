@@ -144,9 +144,11 @@ const Heynote = {
         if (currencyData !== null) {
             return currencyData
         }
-        const response = await fetch("https://currencies.heynote.com/rates.json", {cache: "no-cache"})
+        const appId = localStorage.getItem("oerAppId")
+        const response = await fetch(`https://openexchangerates.org/api/latest.json?app_id=${appId}`, { referrerPolicy: "no-referrer" })
         currencyData = JSON.parse(await response.text())
-        return currencyData
+        const [date,] = new Date().toISOString().split('T')
+        return { success: true, date, ...currencyData }
     },
 
     async getVersion() {
