@@ -1,0 +1,30 @@
+name: Sync from upstream
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"  # run once a week
+  workflow_dispatch:   # run manually
+
+jobs:
+  sync:
+    name: Rebase upstream and push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+
+      - name: Fetch, rebase, push
+        run: |
+          set -ex
+          
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+
+          git remote add upstream https://github.com/heyman/heynote.git
+          git fetch upstream main
+          git log -10 --pretty=format:"%h %ae %s" main
+          git log -10 --pretty=format:"%h %ae %s" upstream/main
+          git merge-base main upstream/main
+          git rebase upstream/main
+          git push --force-with-lease
