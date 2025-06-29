@@ -11,7 +11,9 @@
     {
       packages = { };
       devShells.default = pkgs.mkShell {
-        buildInputs = with pkgs; [ nodejs ];
+        buildInputs = with pkgs; [ nodejs patchelf ];
+        NIX_LD = pkgs.lib.fileContents "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
+        NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc ];
       };
     });
 }
